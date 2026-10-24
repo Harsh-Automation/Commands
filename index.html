@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dev Cheat Sheet - Playwright &amp; Git</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JSZip and FileSaver CDN for ZIP generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              playwright: '#45ba4b',
+              git: '#f05032',
+              darkBg: '#0f172a',
+              darkCard: '#1e293b',
+              lightBg: '#f8fafc',
+              lightCard: '#ffffff'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+    .code-block {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:JetBrains Mono, monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-y-0{top:0px;bottom:0px}.bottom-5{bottom:1.25rem}.left-0{left:0px}.right-0{right:0px}.right-5{right:1.25rem}.top-0{top:0px}.bottom-2{bottom:0.5rem}.right-2{right:0.5rem}.top-2{top:0.5rem}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mt-12{margin-top:3rem}.mb-1\.5{margin-bottom:0.375rem}.mb-2{margin-bottom:0.5rem}.mt-auto{margin-top:auto}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-16{height:4rem}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-7xl{max-width:80rem}.max-w-sm{max-width:24rem}.flex-1{flex:1 1 0%}.translate-y-20{--tw-translate-y:5rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.self-start{align-self:flex-start}.overflow-x-auto{overflow-x:auto}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-xl{border-radius:0.75rem}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300\/50{border-color:rgb(203 213 225 / 0.5)}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-white\/20{border-color:rgb(255 255 255 / 0.2)}.border-emerald-500\/20{border-color:rgb(16 185 129 / 0.2)}.border-slate-200\/50{border-color:rgb(226 232 240 / 0.5)}.border-slate-200\/80{border-color:rgb(226 232 240 / 0.8)}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.bg-brand-lightBg{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200\/80{background-color:rgb(226 232 240 / 0.8)}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/20{background-color:rgb(255 255 255 / 0.2)}.bg-white\/50{background-color:rgb(255 255 255 / 0.5)}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.bg-gradient-to-tr{background-image:linear-gradient(to top right, var(--tw-gradient-stops))}.from-emerald-500{--tw-gradient-from:#10b981 var(--tw-gradient-from-position);--tw-gradient-to:rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-emerald-500\/10{--tw-gradient-from:rgb(16 185 129 / 0.1) var(--tw-gradient-from-position);--tw-gradient-to:rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-sky-500{--tw-gradient-to:rgb(14 165 233 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #0ea5e9 var(--tw-gradient-via-position), var(--tw-gradient-to)}.via-emerald-500\/5{--tw-gradient-to:rgb(16 185 129 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), rgb(16 185 129 / 0.05) var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-rose-500{--tw-gradient-to:#f43f5e var(--tw-gradient-to-position)}.to-transparent{--tw-gradient-to:transparent var(--tw-gradient-to-position)}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-3\.5{padding:0.875rem}.p-5{padding:1.25rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.pb-4{padding-bottom:1rem}.pl-10{padding-left:2.5rem}.pl-3\.5{padding-left:0.875rem}.pr-10{padding-right:2.5rem}.pr-3{padding-right:0.75rem}.pr-12{padding-right:3rem}.text-center{text-align:center}.font-sans{font-family:Inter, sans-serif}.font-mono{font-family:JetBrains Mono, monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-\[10px\]{font-size:10px}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-tight{line-height:1.25}.leading-relaxed{line-height:1.625}.tracking-wider{letter-spacing:0.05em}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-green-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-emerald-500{--tw-text-opacity:1;color:rgb(16 185 129 / var(--tw-text-opacity, 1))}.text-emerald-900{--tw-text-opacity:1;color:rgb(6 78 59 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.opacity-0{opacity:0}.opacity-80{opacity:0.8}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-emerald-500\/10{--tw-shadow-color:rgb(16 185 129 / 0.1);--tw-shadow:var(--tw-shadow-colored)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.duration-300{transition-duration:300ms}.hover\:bg-emerald-700:hover{--tw-bg-opacity:1;background-color:rgb(4 120 87 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:text-slate-600:hover{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.hover\:text-slate-900:hover{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:shadow-lg:hover{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-md:hover{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-emerald-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(16 185 129 / var(--tw-ring-opacity, 1))}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.dark\:border-slate-300:is(.dark *){--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.dark\:border-slate-700:is(.dark *){--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.dark\:border-slate-700\/50:is(.dark *){border-color:rgb(51 65 85 / 0.5)}.dark\:border-slate-800:is(.dark *){--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.dark\:border-slate-600\/30:is(.dark *){border-color:rgb(71 85 105 / 0.3)}.dark\:border-slate-700\/80:is(.dark *){border-color:rgb(51 65 85 / 0.8)}.dark\:bg-brand-darkBg:is(.dark *){--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-100:is(.dark *){--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-700:is(.dark *){--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800\/80:is(.dark *){background-color:rgb(30 41 59 / 0.8)}.dark\:bg-slate-900\/50:is(.dark *){background-color:rgb(15 23 42 / 0.5)}.dark\:bg-slate-900\/80:is(.dark *){background-color:rgb(15 23 42 / 0.8)}.dark\:bg-slate-700\/60:is(.dark *){background-color:rgb(51 65 85 / 0.6)}.dark\:bg-white:is(.dark *){--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.dark\:text-slate-100:is(.dark *){--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.dark\:text-emerald-400:is(.dark *){--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.dark\:text-slate-300:is(.dark *){--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.dark\:text-slate-400:is(.dark *){--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.dark\:text-slate-900:is(.dark *){--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.dark\:text-emerald-200:is(.dark *){--tw-text-opacity:1;color:rgb(167 243 208 / var(--tw-text-opacity, 1))}.dark\:text-white:is(.dark *){--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.dark\:hover\:bg-slate-700:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.dark\:hover\:text-slate-200:hover:is(.dark *){--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.dark\:hover\:text-white:hover:is(.dark *){--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.dark\:focus\:ring-emerald-400:focus:is(.dark *){--tw-ring-opacity:1;--tw-ring-color:rgb(52 211 153 / var(--tw-ring-opacity, 1))}@media (min-width: 640px){.sm\:inline{display:inline}.sm\:hidden{display:none}.sm\:space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}}@media (min-width: 768px){.md\:w-80{width:20rem}.md\:w-auto{width:auto}.md\:flex-none{flex:none}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}}@media (min-width: 1024px){.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style></head>
+<body class="bg-brand-lightBg dark:bg-brand-darkBg text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200 flex flex-col font-sans">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 pointer-events-none border border-slate-700 dark:border-slate-300">
+    <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
+    <span id="toast-message" class="text-sm font-medium">Copied to clipboard!</span>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-gradient-to-tr from-emerald-500 via-sky-500 to-rose-500 rounded-xl text-white shadow-lg shadow-emerald-500/10">
+          <i class="fa-solid fa-terminal text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Dev CheatSheet</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Playwright, Selenium &amp; Git Reference</p>
+        </div>
+      </div>
+
+      <!-- Controls & Theme Toggle -->
+      <div class="flex items-center space-x-2 sm:space-x-4">
+        <!-- Download ZIP Button -->
+        <button id="download-zip-btn" onclick="downloadProjectZip()" class="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium px-3 py-2 rounded-xl transition shadow-md hover:shadow-lg active:scale-95">
+          <i class="fa-solid fa-file-zipper"></i>
+          <span class="hidden sm:inline">Export Website (.zip)</span>
+          <span class="sm:hidden">ZIP</span>
+        </button>
+
+        <!-- Dark/Light Mode Switcher -->
+        <button id="theme-toggle" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition focus:outline-none">
+          <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-lg hidden"></i>
+          <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    
+    <!-- Navigation Tabs & Search Toolbar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      
+      <!-- Main Tabs -->
+      <div class="flex bg-slate-200/80 dark:bg-slate-800/80 p-1.5 rounded-2xl w-full md:w-auto self-start border border-slate-300/50 dark:border-slate-700/50 overflow-x-auto no-scrollbar">
+        <button id="tab-playwright" onclick="switchTab('playwright')" class="flex-1 md:flex-none flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400">
+          <i class="fa-solid fa-vial"></i>
+          <span>Playwright</span>
+        </button>
+        <button id="tab-selenium" onclick="switchTab('selenium')" class="flex-1 md:flex-none flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          <i class="fa-solid fa-cubes"></i>
+          <span>Selenium</span>
+        </button>
+        <button id="tab-git" onclick="switchTab('git')" class="flex-1 md:flex-none flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          <i class="fa-brands fa-git-alt text-base"></i>
+          <span>Git</span>
+        </button>
+      </div>
+
+      <!-- Search Input -->
+      <div class="relative w-full md:w-80">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <input type="text" id="search-input" oninput="handleSearch()" placeholder="Search commands, flags, docs..." class="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 text-sm shadow-sm transition">
+        <button id="clear-search" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div id="category-bar" class="flex items-center space-x-2 overflow-x-auto pb-4 mb-6 text-sm no-scrollbar">
+        <button onclick="selectCategory('all')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm">
+          All Categories
+        </button>
+      
+          <button onclick="selectCategory('pw-install')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+            Installation &amp; Setup
+          </button>
+        
+          <button onclick="selectCategory('pw-run')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+            Running Tests
+          </button>
+        
+          <button onclick="selectCategory('pw-selectors')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+            Locators &amp; Selectors
+          </button>
+        
+          <button onclick="selectCategory('pw-actions')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+            Actions &amp; Interactions
+          </button>
+        
+          <button onclick="selectCategory('pw-assertions')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+            Assertions
+          </button>
+        
+          <button onclick="selectCategory('pw-utils')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+            CodeGen &amp; Utilities
+          </button>
+        </div>
+
+    <!-- Active Tab Banner -->
+    <div id="tab-banner" class="mb-8 p-4 rounded-2xl bg-gradient-to-r border flex items-center justify-between transition-all from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500/20 text-emerald-900 dark:text-emerald-200">
+      <div class="flex items-center space-x-3">
+        <div id="banner-icon" class="p-3 rounded-xl text-2xl"><i class="fa-solid fa-vial text-emerald-500"></i></div>
+        <div>
+          <h2 id="banner-title" class="text-lg font-bold">Playwright Automation</h2>
+          <p id="banner-desc" class="text-xs opacity-80">Modern end-to-end testing for web apps. Reliable, fast, and multi-browser.</p>
+        </div>
+      </div>
+      <div id="command-count" class="text-xs font-mono px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 font-semibold">31 Commands</div>
+    </div>
+
+    <!-- Commands Grid Container -->
+    <div id="commands-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Installation &amp; Setup
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Initialize Playwright</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Sets up a new Playwright project with config, sample tests, and GitHub Actions workflow.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npm init playwright@latest</code>
+              </div>
+              <button onclick="copyToClipboard(`npm init playwright@latest`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Installation &amp; Setup
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Install Browsers</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Downloads required browser binaries (Chromium, Firefox, WebKit).</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright install</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright install`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Installation &amp; Setup
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Install Specific Browser</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Installs only specified browser engine.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright install chromium</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright install chromium`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Installation &amp; Setup
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Install Dependencies</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Installs system dependencies required for headless browsers on Linux.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright install-deps</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright install-deps`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Running Tests
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Run All Tests</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Executes all tests in headless mode across configured browsers.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright test</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright test`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Running Tests
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Run in Headed Mode</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Runs tests with visible browser UI.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright test --headed</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright test --headed`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Running Tests
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Run Specific Test File</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Executes test file directly.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright test tests/login.spec.ts</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright test tests/login.spec.ts`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Running Tests
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Run UI Mode</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Opens interactive UI Mode with time-travel debugging, watch mode, and locator generator.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright test --ui</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright test --ui`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Running Tests
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Debug Mode</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Launches Playwright Inspector to step through tests line by line.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright test --debug</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright test --debug`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Running Tests
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Show HTML Report</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Opens the generated HTML test execution report in browser.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright show-report</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright show-report`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Locators &amp; Selectors
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">By Role</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Locates by ARIA role and accessible name (Recommended).</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>page.getByRole('button', { name: 'Submit' })</code>
+              </div>
+              <button onclick="copyToClipboard(`page.getByRole('button', { name: 'Submit' })`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Locators &amp; Selectors
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">By Text</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Locates element by visible text content.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>page.getByText('Welcome back')</code>
+              </div>
+              <button onclick="copyToClipboard(`page.getByText('Welcome back')`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Locators &amp; Selectors
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">By Label</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Locates form control by associated label text.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>page.getByLabel('Username')</code>
+              </div>
+              <button onclick="copyToClipboard(`page.getByLabel('Username')`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Locators &amp; Selectors
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">By Placeholder</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Locates input by placeholder text.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>page.getByPlaceholder('Enter password')</code>
+              </div>
+              <button onclick="copyToClipboard(`page.getByPlaceholder('Enter password')`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Locators &amp; Selectors
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">By Test ID</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Locates element by data-testid attribute.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>page.getByTestId('submit-btn')</code>
+              </div>
+              <button onclick="copyToClipboard(`page.getByTestId('submit-btn')`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Locators &amp; Selectors
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">CSS / XPath Fallback</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Locates elements using standard CSS selectors or XPath.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>page.locator('css=button.btn-primary')</code>
+              </div>
+              <button onclick="copyToClipboard(`page.locator('css=button.btn-primary')`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Actions &amp; Interactions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Click Element</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Clicks element automatically waiting for visibility &amp; actionability.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.getByRole('button').click();</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.getByRole('button').click();`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Actions &amp; Interactions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Type / Fill Text</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Clears field and types given text string.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.getByLabel('Email').fill('user@test.com');</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.getByLabel('Email').fill('user@test.com');`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Actions &amp; Interactions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Check / Uncheck Box</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Checks a checkbox or radio button.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.getByLabel('Subscribe').check();</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.getByLabel('Subscribe').check();`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Actions &amp; Interactions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Select Dropdown Option</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Selects option in <select> dropdown by value or label.<p></p>
+            
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.getByLabel('Country').selectOption('US');</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.getByLabel('Country').selectOption('US');`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Actions &amp; Interactions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Press Keyboard Keys</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Sends keyboard key stroke.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.keyboard.press('Enter');</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.keyboard.press('Enter');`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Actions &amp; Interactions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Upload File</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Attaches local files to file input element.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.getByLabel('Upload').setInputFiles('path/to/file.png');</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.getByLabel('Upload').setInputFiles('path/to/file.png');`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Actions &amp; Interactions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Hover Over Element</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Hovers mouse cursor over element.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.getByTestId('card').hover();</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.getByTestId('card').hover();`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Assertions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Assert Visibility</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Ensures element is visible on page.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await expect(page.getByText('Success')).toBeVisible();</code>
+              </div>
+              <button onclick="copyToClipboard(`await expect(page.getByText('Success')).toBeVisible();`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Assertions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Assert Text Content</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Checks exact element text content.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await expect(page.locator('.title')).toHaveText('Dashboard');</code>
+              </div>
+              <button onclick="copyToClipboard(`await expect(page.locator('.title')).toHaveText('Dashboard');`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Assertions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Assert URL</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Asserts current page URL matches string or regex.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await expect(page).toHaveURL(/.*dashboard/);</code>
+              </div>
+              <button onclick="copyToClipboard(`await expect(page).toHaveURL(/.*dashboard/);`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Assertions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Assert Input Value</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Asserts input element value.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await expect(page.getByLabel('Search')).toHaveValue('Playwright');</code>
+              </div>
+              <button onclick="copyToClipboard(`await expect(page.getByLabel('Search')).toHaveValue('Playwright');`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  Assertions
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Assert State Disabled</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Ensures button or input is disabled.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await expect(page.getByRole('button')).toBeDisabled();</code>
+              </div>
+              <button onclick="copyToClipboard(`await expect(page.getByRole('button')).toBeDisabled();`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  CodeGen &amp; Utilities
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Generate Code (CodeGen)</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Records actions in browser and auto-generates test scripts.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright codegen https://example.com</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright codegen https://example.com`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  CodeGen &amp; Utilities
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Trace Viewer</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Opens recorded test execution trace with DOM snapshots and network logs.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>npx playwright show-trace trace.zip</code>
+              </div>
+              <button onclick="copyToClipboard(`npx playwright show-trace trace.zip`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  CodeGen &amp; Utilities
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">Screenshot Page</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Captures full page screenshot.</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>await page.screenshot({ path: 'screenshot.png', fullPage: true });</code>
+              </div>
+              <button onclick="copyToClipboard(`await page.screenshot({ path: 'screenshot.png', fullPage: true });`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        </select></p></div></div></div>
+
+    <!-- No Results Placeholder -->
+    <div id="no-results" class="hidden flex-col items-center justify-center py-16 text-center">
+      <div class="p-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 text-4xl mb-4">
+        <i class="fa-solid fa-ghost"></i>
+      </div>
+      <h3 class="text-lg font-semibold mb-1">No matching commands found</h3>
+      <p class="text-slate-500 dark:text-slate-400 text-sm max-w-sm mb-4">Try adjusting your search filter or clear the input to see all available commands.</p>
+      <button onclick="clearSearch()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-xl transition">Clear Search</button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+      <p>Interactive Developer Cheat Sheet • Lightweight, fast &amp; fully portable</p>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    // Commands Data Store
+    const cheatSheetData = {
+      playwright: {
+        title: "Playwright Automation",
+        description: "Modern end-to-end testing for web apps. Reliable, fast, and multi-browser.",
+        icon: "fa-solid fa-vial text-emerald-500",
+        bannerClass: "from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500/20 text-emerald-900 dark:text-emerald-200",
+        categories: [
+          {
+            name: "Installation & Setup",
+            id: "pw-install",
+            items: [
+              { name: "Initialize Playwright", code: "npm init playwright@latest", desc: "Sets up a new Playwright project with config, sample tests, and GitHub Actions workflow." },
+              { name: "Install Browsers", code: "npx playwright install", desc: "Downloads required browser binaries (Chromium, Firefox, WebKit)." },
+              { name: "Install Specific Browser", code: "npx playwright install chromium", desc: "Installs only specified browser engine." },
+              { name: "Install Dependencies", code: "npx playwright install-deps", desc: "Installs system dependencies required for headless browsers on Linux." }
+            ]
+          },
+          {
+            name: "Running Tests",
+            id: "pw-run",
+            items: [
+              { name: "Run All Tests", code: "npx playwright test", desc: "Executes all tests in headless mode across configured browsers." },
+              { name: "Run in Headed Mode", code: "npx playwright test --headed", desc: "Runs tests with visible browser UI." },
+              { name: "Run Specific Test File", code: "npx playwright test tests/login.spec.ts", desc: "Executes test file directly." },
+              { name: "Run UI Mode", code: "npx playwright test --ui", desc: "Opens interactive UI Mode with time-travel debugging, watch mode, and locator generator." },
+              { name: "Debug Mode", code: "npx playwright test --debug", desc: "Launches Playwright Inspector to step through tests line by line." },
+              { name: "Show HTML Report", code: "npx playwright show-report", desc: "Opens the generated HTML test execution report in browser." }
+            ]
+          },
+          {
+            name: "Locators & Selectors",
+            id: "pw-selectors",
+            items: [
+              { name: "By Role", code: "page.getByRole('button', { name: 'Submit' })", desc: "Locates by ARIA role and accessible name (Recommended)." },
+              { name: "By Text", code: "page.getByText('Welcome back')", desc: "Locates element by visible text content." },
+              { name: "By Label", code: "page.getByLabel('Username')", desc: "Locates form control by associated label text." },
+              { name: "By Placeholder", code: "page.getByPlaceholder('Enter password')", desc: "Locates input by placeholder text." },
+              { name: "By Test ID", code: "page.getByTestId('submit-btn')", desc: "Locates element by data-testid attribute." },
+              { name: "CSS / XPath Fallback", code: "page.locator('css=button.btn-primary')", desc: "Locates elements using standard CSS selectors or XPath." }
+            ]
+          },
+          {
+            name: "Actions & Interactions",
+            id: "pw-actions",
+            items: [
+              { name: "Click Element", code: "await page.getByRole('button').click();", desc: "Clicks element automatically waiting for visibility & actionability." },
+              { name: "Type / Fill Text", code: "await page.getByLabel('Email').fill('user@test.com');", desc: "Clears field and types given text string." },
+              { name: "Check / Uncheck Box", code: "await page.getByLabel('Subscribe').check();", desc: "Checks a checkbox or radio button." },
+              { name: "Select Dropdown Option", code: "await page.getByLabel('Country').selectOption('US');", desc: "Selects option in <select> dropdown by value or label." },
+              { name: "Press Keyboard Keys", code: "await page.keyboard.press('Enter');", desc: "Sends keyboard key stroke." },
+              { name: "Upload File", code: "await page.getByLabel('Upload').setInputFiles('path/to/file.png');", desc: "Attaches local files to file input element." },
+              { name: "Hover Over Element", code: "await page.getByTestId('card').hover();", desc: "Hovers mouse cursor over element." }
+            ]
+          },
+          {
+            name: "Assertions",
+            id: "pw-assertions",
+            items: [
+              { name: "Assert Visibility", code: "await expect(page.getByText('Success')).toBeVisible();", desc: "Ensures element is visible on page." },
+              { name: "Assert Text Content", code: "await expect(page.locator('.title')).toHaveText('Dashboard');", desc: "Checks exact element text content." },
+              { name: "Assert URL", code: "await expect(page).toHaveURL(/.*dashboard/);", desc: "Asserts current page URL matches string or regex." },
+              { name: "Assert Input Value", code: "await expect(page.getByLabel('Search')).toHaveValue('Playwright');", desc: "Asserts input element value." },
+              { name: "Assert State Disabled", code: "await expect(page.getByRole('button')).toBeDisabled();", desc: "Ensures button or input is disabled." }
+            ]
+          },
+          {
+            name: "CodeGen & Utilities",
+            id: "pw-utils",
+            items: [
+              { name: "Generate Code (CodeGen)", code: "npx playwright codegen https://example.com", desc: "Records actions in browser and auto-generates test scripts." },
+              { name: "Trace Viewer", code: "npx playwright show-trace trace.zip", desc: "Opens recorded test execution trace with DOM snapshots and network logs." },
+              { name: "Screenshot Page", code: "await page.screenshot({ path: 'screenshot.png', fullPage: true });", desc: "Captures full page screenshot." }
+            ]
+          }
+        ]
+      },
+      selenium: {
+        title: "Selenium WebDriver",
+        description: "Industry standard cross-browser automation across Python, JavaScript, and Java.",
+        icon: "fa-solid fa-cubes text-sky-500",
+        bannerClass: "from-sky-500/10 via-sky-500/5 to-transparent border-sky-500/20 text-sky-900 dark:text-sky-200",
+        categories: [
+          {
+            name: "Setup & Initialization",
+            id: "sel-setup",
+            items: [
+              { name: "Initialize Chrome (Python)", code: "from selenium import webdriver\n\ndriver = webdriver.Chrome()", desc: "Creates a new Chrome WebDriver instance using Selenium Manager." },
+              { name: "Initialize Driver (JS)", code: "const { Builder } = require('selenium-webdriver');\nlet driver = await new Builder().forBrowser('chrome').build();", desc: "Initializes async WebDriver instance in Node.js." },
+              { name: "Initialize Driver (Java)", code: "WebDriver driver = new ChromeDriver();", desc: "Instantiates ChromeDriver in Java." },
+              { name: "Navigate to URL", code: "driver.get('https://example.com');", desc: "Opens target URL in active browser window." },
+              { name: "Close & Quit Driver", code: "driver.quit()", desc: "Closes all open browser windows and safely terminates session." }
+            ]
+          },
+          {
+            name: "Locating Elements",
+            id: "sel-locators",
+            items: [
+              { name: "By ID (Python)", code: "element = driver.find_element(By.ID, 'submit-btn')", desc: "Locates element by ID attribute." },
+              { name: "By CSS Selector (Python)", code: "element = driver.find_element(By.CSS_SELECTOR, '.btn-primary')", desc: "Finds element using CSS selector syntax." },
+              { name: "By XPath (Python)", code: "element = driver.find_element(By.XPATH, '//button[text()=\"Submit\"]')", desc: "Locates element using XPath expression." },
+              { name: "Find Multiple Elements", code: "elements = driver.find_elements(By.TAG_NAME, 'a')", desc: "Returns list of matching web elements." }
+            ]
+          },
+          {
+            name: "Interactions & Actions",
+            id: "sel-actions",
+            items: [
+              { name: "Click Element", code: "element.click()", desc: "Clicks specified web element." },
+              { name: "Type Text into Input", code: "element.send_keys('hello@example.com')", desc: "Sends keyboard inputs/keystrokes to input field." },
+              { name: "Clear Text Field", code: "element.clear()", desc: "Clears value inside text box." },
+              { name: "Select Dropdown Option", code: "from selenium.webdriver.support.ui import Select\nselect = Select(element)\nselect.select_by_visible_text('Option 1')", desc: "Interacts with standard HTML <select> element." }
+            ]
+          },
+          {
+            name: "Explicit & Implicit Waits",
+            id: "sel-waits",
+            items: [
+              { name: "Implicit Wait", code: "driver.implicitly_wait(10)", desc: "Sets global max wait time for element retrieval." },
+              { name: "Explicit Wait (Python)", code: "from selenium.webdriver.support.ui import WebDriverWait\nfrom selenium.webdriver.support import expected_conditions as EC\n\nelement = WebDriverWait(driver, 10).until(\n    EC.presence_of_element_located((By.ID, 'myElement'))\n)", desc: "Waits dynamically until specific condition evaluates true." },
+              { name: "Wait Until Clickable", code: "WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'btn')))", desc: "Waits until element is visible and enabled for clicking." }
+            ]
+          },
+          {
+            name: "Windows & Frames",
+            id: "sel-windows",
+            items: [
+              { name: "Switch to Frame", code: "driver.switch_to.frame('iframe_name')", desc: "Switches driver focus to iframe." },
+              { name: "Switch Back to Default Content", code: "driver.switch_to.default_content()", desc: "Returns focus back to primary page document." },
+              { name: "Switch to Window / Tab", code: "driver.switch_to.window(driver.window_handles[1])", desc: "Switches context to different window handle." },
+              { name: "Handle Alert (Accept)", code: "driver.switch_to.alert.accept()", desc: "Accepts browser JavaScript alert pop-up." }
+            ]
+          },
+          {
+            name: "Advanced User Actions / JS",
+            id: "sel-advanced",
+            items: [
+              { name: "Execute Custom JavaScript", code: "driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')", desc: "Executes JavaScript directly in browser." },
+              { name: "Mouse Hover Action", code: "from selenium.webdriver import ActionChains\n\nactions = ActionChains(driver)\nactions.move_to_element(element).perform()", desc: "Performs hover sequence over element." },
+              { name: "Drag and Drop", code: "actions.drag_and_drop(source, target).perform()", desc: "Drags element to target element position." },
+              { name: "Take Screenshot", code: "driver.save_screenshot('page.png')", desc: "Saves screenshot image to local storage." }
+            ]
+          }
+        ]
+      },
+      git: {
+        title: "Git Version Control",
+        description: "Distributed source code management tool. Track changes, branch, and collaborate.",
+        icon: "fa-brands fa-git-alt text-rose-500",
+        bannerClass: "from-rose-500/10 via-rose-500/5 to-transparent border-rose-500/20 text-rose-900 dark:text-rose-200",
+        categories: [
+          {
+            name: "Setup & Config",
+            id: "git-setup",
+            items: [
+              { name: "Set Global User Name", code: "git config --global user.name \"Your Name\"", desc: "Configures author name applied to all commits." },
+              { name: "Set Global Email", code: "git config --global user.email \"you@example.com\"", desc: "Configures email tied to commits." },
+              { name: "Initialize Repository", code: "git init", desc: "Creates new Git repository in current directory." },
+              { name: "Clone Repository", code: "git clone <repository-url>", desc: "Downloads existing repository from remote source." }
+            ]
+          },
+          {
+            name: "Staging & Committing",
+            id: "git-commit",
+            items: [
+              { name: "Check File Status", code: "git status", desc: "Lists modified, staged, or untracked files." },
+              { name: "Stage Specific File", code: "git add <filename>", desc: "Adds changes to staging area." },
+              { name: "Stage All Changes", code: "git add .", desc: "Stages all modified, deleted, and new files." },
+              { name: "Commit Staged Changes", code: "git commit -m \"Descriptive commit message\"", desc: "Saves staged snapshot with message." },
+              { name: "Amend Last Commit", code: "git commit --amend -m \"Updated message\"", desc: "Modifies previous commit message or adds newly staged files." }
+            ]
+          },
+          {
+            name: "Branching & Merging",
+            id: "git-branch",
+            items: [
+              { name: "List Branches", code: "git branch -a", desc: "Lists all local and remote tracking branches." },
+              { name: "Create & Switch Branch", code: "git checkout -b <branch-name>", desc: "Creates a new branch and switches to it immediately." },
+              { name: "Switch Branch (Modern)", code: "git switch <branch-name>", desc: "Switches to targeted existing branch." },
+              { name: "Merge Branch", code: "git merge <branch-name>", desc: "Integrates specified branch changes into current active branch." },
+              { name: "Delete Local Branch", code: "git branch -d <branch-name>", desc: "Deletes branch if changes have been merged." }
+            ]
+          },
+          {
+            name: "Remote Repositories",
+            id: "git-remote",
+            items: [
+              { name: "List Remote Connections", code: "git remote -v", desc: "Displays configured remote URLs." },
+              { name: "Add Remote", code: "git remote add origin <url>", desc: "Connects local repository to remote origin URL." },
+              { name: "Push Changes", code: "git push -u origin <branch-name>", desc: "Uploads local branch commits to remote repository and sets upstream." },
+              { name: "Fetch Updates", code: "git fetch", desc: "Downloads changes from remote without merging into active branch." },
+              { name: "Pull Updates", code: "git pull", desc: "Fetches changes and automatically merges into current branch." }
+            ]
+          },
+          {
+            name: "Inspection & History",
+            id: "git-inspect",
+            items: [
+              { name: "View Commit Log", code: "git log --oneline --graph --all", desc: "Displays concise formatted commit history visual tree." },
+              { name: "View Changes (Diff)", code: "git diff", desc: "Shows unstaged modifications between working tree and staging area." },
+              { name: "View Staged Diff", code: "git diff --staged", desc: "Shows changes staged for next commit." },
+              { name: "Blame File Line-by-Line", code: "git blame <filename>", desc: "Shows author and commit hash for each line of file." }
+            ]
+          },
+          {
+            name: "Undo & Stash",
+            id: "git-undo",
+            items: [
+              { name: "Unstage File", code: "git restore --staged <filename>", desc: "Removes file from staging area while preserving file changes." },
+              { name: "Discard Working Directory Changes", code: "git restore <filename>", desc: "Reverts file back to last committed state." },
+              { name: "Stash Changes", code: "git stash", desc: "Temporarily shelves uncommitted changes to work on clean directory." },
+              { name: "Pop Stashed Changes", code: "git stash pop", desc: "Re-applies most recently stashed changes and removes from stash list." }
+            ]
+          }
+        ]
+      }
+    };
+
+    // App State
+    let activeTab = 'playwright';
+    let selectedCategory = 'all';
+    let searchQuery = '';
+
+    // Init App
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      renderApp();
+    });
+
+    // Theme Switcher Logic
+    function initTheme() {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-toggle-dark-icon').classList.add('hidden');
+        document.getElementById('theme-toggle-light-icon').classList.remove('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('theme-toggle-dark-icon').classList.remove('hidden');
+        document.getElementById('theme-toggle-light-icon').classList.add('hidden');
+      }
+
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.theme = isDark ? 'dark' : 'light';
+        document.getElementById('theme-toggle-dark-icon').classList.toggle('hidden', !isDark);
+        document.getElementById('theme-toggle-light-icon').classList.toggle('hidden', isDark);
+      });
+    }
+
+    // Switch Main Tabs
+    function switchTab(tab) {
+      if (activeTab === tab) return;
+      activeTab = tab;
+      selectedCategory = 'all';
+      
+      // Update Tab Styles
+      const playwrightBtn = document.getElementById('tab-playwright');
+      const seleniumBtn = document.getElementById('tab-selenium');
+      const gitBtn = document.getElementById('tab-git');
+
+      // Reset base styles
+      const inactiveStyle = "flex-1 md:flex-none flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+      
+      playwrightBtn.className = inactiveStyle;
+      seleniumBtn.className = inactiveStyle;
+      gitBtn.className = inactiveStyle;
+
+      if (tab === 'playwright') {
+        playwrightBtn.className = "flex-1 md:flex-none flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400";
+      } else if (tab === 'selenium') {
+        seleniumBtn.className = "flex-1 md:flex-none flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400";
+      } else {
+        gitBtn.className = "flex-1 md:flex-none flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400";
+      }
+
+      renderApp();
+    }
+
+    // Handle Category Filter Selection
+    function selectCategory(catId) {
+      selectedCategory = catId;
+      renderCategories();
+      renderCommands();
+    }
+
+    // Search Logic
+    function handleSearch() {
+      const input = document.getElementById('search-input');
+      searchQuery = input.value.trim().toLowerCase();
+      
+      const clearBtn = document.getElementById('clear-search');
+      if (searchQuery.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      renderCommands();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('search-input');
+      input.value = '';
+      searchQuery = '';
+      document.getElementById('clear-search').classList.add('hidden');
+      renderCommands();
+    }
+
+    // Main Render Function
+    function renderApp() {
+      renderBanner();
+      renderCategories();
+      renderCommands();
+    }
+
+    // Render Tab Hero Banner
+    function renderBanner() {
+      const data = cheatSheetData[activeTab];
+      const banner = document.getElementById('tab-banner');
+      
+      banner.className = `mb-8 p-4 rounded-2xl bg-gradient-to-r border flex items-center justify-between transition-all ${data.bannerClass}`;
+      document.getElementById('banner-icon').innerHTML = `<i class="${data.icon}"></i>`;
+      document.getElementById('banner-title').innerText = data.title;
+      document.getElementById('banner-desc').innerText = data.description;
+    }
+
+    // Render Category Pills
+    function renderCategories() {
+      const container = document.getElementById('category-bar');
+      const categories = cheatSheetData[activeTab].categories;
+      
+      let html = `
+        <button onclick="selectCategory('all')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap ${selectedCategory === 'all' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+          All Categories
+        </button>
+      `;
+
+      categories.forEach(cat => {
+        const isActive = selectedCategory === cat.id;
+        html += `
+          <button onclick="selectCategory('${cat.id}')" class="px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap ${isActive ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+            ${cat.name}
+          </button>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Render Command Cards Grid
+    function renderCommands() {
+      const container = document.getElementById('commands-container');
+      const noResults = document.getElementById('no-results');
+      const data = cheatSheetData[activeTab];
+
+      let filteredItems = [];
+
+      data.categories.forEach(cat => {
+        if (selectedCategory === 'all' || selectedCategory === cat.id) {
+          cat.items.forEach(item => {
+            const matchesQuery = searchQuery === '' || 
+              item.name.toLowerCase().includes(searchQuery) ||
+              item.code.toLowerCase().includes(searchQuery) ||
+              item.desc.toLowerCase().includes(searchQuery) ||
+              cat.name.toLowerCase().includes(searchQuery);
+
+            if (matchesQuery) {
+              filteredItems.push({ ...item, categoryName: cat.name });
+            }
+          });
+        }
+      });
+
+      // Update count badge
+      document.getElementById('command-count').innerText = `${filteredItems.length} Commands`;
+
+      if (filteredItems.length === 0) {
+        container.innerHTML = '';
+        noResults.classList.remove('hidden');
+        noResults.classList.add('flex');
+        return;
+      }
+
+      noResults.classList.add('hidden');
+      noResults.classList.remove('flex');
+
+      let cardsHtml = '';
+      filteredItems.forEach((cmd, idx) => {
+        cardsHtml += `
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-600/30">
+                  ${cmd.categoryName}
+                </span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base mb-1.5">${highlightMatch(cmd.name, searchQuery)}</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">${highlightMatch(cmd.desc, searchQuery)}</p>
+            </div>
+
+            <!-- Code Snippet Box -->
+            <div class="relative mt-auto">
+              <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl code-block text-xs sm:text-sm overflow-x-auto pr-12 border border-slate-800 shadow-inner">
+                <code>${escapeHtml(cmd.code)}</code>
+              </div>
+              <button onclick="copyToClipboard(\`${escapeJsQuotes(cmd.code)}\`)" title="Copy Code" class="absolute right-2 top-2 bottom-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all flex items-center justify-center border border-slate-700 active:scale-95">
+                <i class="fa-regular fa-copy text-sm"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = cardsHtml;
+    }
+
+    // Utility: Highlight Search Query Text
+    function highlightMatch(text, query) {
+      if (!query) return text;
+      const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+      return text.replace(regex, `<mark class="bg-amber-200 dark:bg-amber-500/30 dark:text-amber-200 text-amber-900 rounded px-0.5">$1</mark>`);
+    }
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function escapeJsQuotes(str) {
+      return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    }
+
+    // Copy to Clipboard with Toast Notification
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        document.execCommand('copy');
+        showToast('Copied to clipboard!');
+      } catch (err) {
+        showToast('Failed to copy code.');
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.innerText = message;
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    // Zip File Export Feature using JSZip
+    function downloadProjectZip() {
+      const zip = new JSZip();
+
+      // Get complete self-contained HTML source
+      const pageHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+
+      // Add files into ZIP structure
+      zip.file("index.html", pageHtml);
+      
+      // README file
+      const readmeContent = `# Playwright, Selenium & Git Cheat Sheet
+
+This package contains the complete stand-alone website for Playwright, Selenium, and Git commands reference.
+
+## Usage
+1. Open \`index.html\` directly in any modern web browser.
+2. No local server or build tools required!
+
+## Features
+- Toggle between Playwright, Selenium, and Git tabs
+- Search filter across commands
+- Category filtering
+- One-click copy code snippets
+- Dark and Light mode switcher
+`;
+      zip.file("README.md", readmeContent);
+
+      // Generate Zip File
+      zip.generateAsync({ type: "blob" }).then(function (content) {
+        saveAs(content, "Dev_CheatSheet.zip");
+        showToast("ZIP package downloaded!");
+      }).catch(err => {
+        showToast("Error generating ZIP package.");
+      });
+    }
+  </script>
+
+</body></html>
